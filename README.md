@@ -30,6 +30,8 @@ Consent and audit aren't in the platform yet, so Toolsmith ships them at the app
 
 ## Status
 
+Live at https://web-mcp-hackathon2026.vercel.app. The sandbox is at `/sandbox`; the builder at `/` is a placeholder until M4.
+
 Active build. Milestones in `CLAUDE.md`. The `research/` folder is the full pre-build research pack, kept as-is for provenance.
 
 Built with Claude Code. Started for the OpenAI WebMCP Challenge; I was disqualified on an employer conflict-of-interest rule before submitting, and decided the thing was worth building anyway.
