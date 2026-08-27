@@ -48,7 +48,14 @@ const MAX_FIELD_CHARS = 200;
 /** Argument names that never reach a receipt, whatever they contain. */
 const SECRET_KEY_PATTERN = /key|token|secret|password|credential|authorization|cookie/i;
 
-let ledger: readonly Receipt[] = [];
+/**
+ * One frozen empty array, shared. `getServerLedger` feeds `useSyncExternalStore`'s
+ * server snapshot, which must be referentially stable: a fresh `[]` per call reads as a
+ * changed store on every render and React spins.
+ */
+const NO_RECEIPTS: readonly Receipt[] = Object.freeze([]);
+
+let ledger: readonly Receipt[] = NO_RECEIPTS;
 const listeners = new Set<() => void>();
 
 function publish(next: readonly Receipt[]): void {
@@ -64,14 +71,13 @@ export function subscribeLedger(listener: () => void): () => void {
 }
 
 export const getLedger = (): readonly Receipt[] => ledger;
-export const getServerLedger = (): readonly Receipt[] => [];
+export const getServerLedger = () => NO_RECEIPTS;
 
 /** Test seam. Drops the ledger and the session key. */
 export function resetLedger(): void {
-  ledger = [];
   sessionKeys = null;
   keyPromise = null;
-  publish([]);
+  publish(NO_RECEIPTS);
 }
 
 // ---------------------------------------------------------------------------

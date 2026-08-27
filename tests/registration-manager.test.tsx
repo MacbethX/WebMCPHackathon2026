@@ -127,6 +127,34 @@ describe("mount, abort, remount", () => {
   });
 });
 
+describe("what the browser actually passes", () => {
+  it("still runs when the browser calls execute with no options argument", async () => {
+    const context = installFakeModelContext();
+    const seen: Array<{ signal: AbortSignal }> = [];
+    render(
+      <ToolRegistration
+        spec={makeSpec({
+          execute: (_args, options) => {
+            seen.push(options);
+            return toolText("ok");
+          },
+        })}
+      />,
+    );
+    await waitFor(() => expect(context.live()).toHaveLength(1));
+
+    // Chrome invokes execute(input) with a single argument. webmcp-types says otherwise.
+    const registered = context.live()[0].tool as unknown as {
+      execute: (args: Record<string, unknown>) => unknown;
+    };
+    const result = await registered.execute({});
+
+    expect(result).toEqual({ content: [{ type: "text", text: "ok" }] });
+    expect(seen[0].signal).toBeInstanceOf(AbortSignal);
+    expect(seen[0].signal.aborted).toBe(false);
+  });
+});
+
 describe("re-registration identity", () => {
   it("does not re-register when only execute changes", async () => {
     const context = installFakeModelContext();

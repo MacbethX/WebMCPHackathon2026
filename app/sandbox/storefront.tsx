@@ -32,7 +32,12 @@ import {
   useWebMCPSupported,
 } from "@/lib/webmcp/registration-manager";
 import { toolError, toolText } from "@/lib/webmcp/tool-result";
-import { ConsentGate, consentRefusalResult, requestConsent } from "@/lib/webmcp/consent-gate";
+import {
+  ConsentGate,
+  consentRefusalResult,
+  formSubmissionNeedsConsent,
+  requestConsent,
+} from "@/lib/webmcp/consent-gate";
 import { appendReceipt } from "@/lib/webmcp/receipt-ledger";
 import { ReceiptLedgerPanel } from "@/lib/webmcp/receipt-ledger-panel";
 import { summarize, withTrust } from "@/lib/webmcp/trust";
@@ -85,6 +90,13 @@ export default function Storefront() {
       const form = event.currentTarget;
       const native = event.nativeEvent as SubmitEvent;
       const byAgent = native.agentInvoked === true;
+      // Chrome reports agentInvoked even when a person pressed the button on a form the
+      // agent filled. Without toolautosubmit that press is the consent, so gating again
+      // would ask twice. This form has no toolautosubmit, by choice.
+      const needsGate = formSubmissionNeedsConsent({
+        agentInvoked: byAgent,
+        autoSubmit: form.hasAttribute("toolautosubmit"),
+      });
 
       // preventDefault must come before respondWith, and this page never navigates on
       // submit in any case.
@@ -94,13 +106,14 @@ export default function Storefront() {
       const name = String(data.get("name") ?? "");
       const message = String(data.get("message") ?? "");
       const args = { name, message };
+      let clearForm = false;
 
       const work = (async (): Promise<CallToolResult> => {
-        // A person pressing the button has consented by pressing it. An agent has not,
-        // so it waits on the same gate the imperative tools use.
+        // A person pressing the button has consented by pressing it, whether or not an
+        // agent filled the fields. Only an unattended submission reaches the gate.
         let consent: ConsentStatus = "human-submitted";
 
-        if (byAgent) {
+        if (needsGate) {
           const decision = await requestConsent({
             toolName: "sign_guestbook",
             title: "Sign the guestbook",
@@ -132,9 +145,11 @@ export default function Storefront() {
         switch (outcome.status) {
           case "accepted":
             setFormNotice(`Thanks, ${outcome.entry.name}. Your note is up.`);
-            // Resetting the form cancels an in-flight declarative invocation, so it
-            // only happens once the work is done and only for a human submission.
-            if (!byAgent) form.reset();
+            // Resetting the form cancels the invocation outright: the agent gets
+            // "Tool execution cancelled by a form reset" instead of its result. So the
+            // reset is only flagged here and performed once the result has been handed
+            // over. See research/raw/spike-6-declarative-form-consent.md.
+            clearForm = true;
             result = toolText(`Signed the guestbook as ${outcome.entry.name}.`);
             break;
           case "rejected":
@@ -163,6 +178,12 @@ export default function Storefront() {
       // Hands the result back to the agent with no navigation. Absent on browsers
       // without the declarative API, where this is an ordinary form.
       native.respondWith?.(work);
+
+      // Attached after respondWith, and deferred to a macrotask, so the browser has
+      // taken the result before the form is cleared out from under the invocation.
+      void work.finally(() => {
+        if (clearForm) setTimeout(() => form.reset(), 0);
+      });
     },
     [append],
   );

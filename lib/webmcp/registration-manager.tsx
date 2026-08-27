@@ -36,6 +36,15 @@ export interface ToolRegistrationStatus {
   error: Error | null;
 }
 
+/**
+ * Chrome invokes `execute(input)` with no second argument, despite `webmcp-types`
+ * declaring `options` as required. Rather than make every tool defensive about it, the
+ * manager normalizes here, at the one point where a tool is handed to the browser, and
+ * substitutes a signal that never fires. See
+ * research/raw/spike-5-execute-called-without-options.md.
+ */
+const NEVER_ABORTED = new AbortController().signal;
+
 const neverChanges = () => () => {};
 const readSupported = () => getModelContext() !== undefined;
 const readSupportedOnServer = () => false;
@@ -117,7 +126,8 @@ export function useToolRegistration(spec: ToolSpec): ToolRegistrationStatus {
           annotations: declaration.annotations,
           // Delegated through the ref so the registered callback always runs the
           // current `execute`, without the registration depending on its identity.
-          execute: (args, options) => specRef.current.execute(args, options),
+          execute: (args: Record<string, unknown>, options?: { signal: AbortSignal }) =>
+            specRef.current.execute(args, options ?? { signal: NEVER_ABORTED }),
         },
         { signal: controller.signal },
       )

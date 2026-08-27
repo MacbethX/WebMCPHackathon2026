@@ -53,7 +53,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/webmcp/budgets.ts` | The character budgets and the linter that enforces them. |
 | `lib/webmcp/tool-result.ts` | `CallToolResult` builders, bounded to the output budget. |
 | `lib/webmcp/registration-manager.tsx` | The only path to `registerTool`. Null-render component, one AbortController per tool, remount-safe. |
-| `lib/webmcp/consent-gate.tsx` | Promise-gated human approval around `execute`. Module-level store, because the browser calls `execute` from outside the React tree. Read-only tools bypass. |
+| `lib/webmcp/consent-gate.tsx` | Promise-gated human approval around `execute`. Module-level store, because the browser calls `execute` from outside the React tree. Read-only tools bypass, and so do declarative forms a person submits. |
 | `lib/webmcp/receipt-ledger.ts` | Append-only signed record of every call. Ed25519 via WebCrypto, session key, canonical JSON, verification and export. |
 | `lib/webmcp/receipt-ledger-panel.tsx` | Renders the ledger and exports it as JSON with the public key attached. |
 | `lib/webmcp/trust.ts` | Composes the gate and the ledger into `withTrust`, which is what the app wraps its tools in. |

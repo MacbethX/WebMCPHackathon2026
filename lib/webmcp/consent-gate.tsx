@@ -40,7 +40,14 @@ export interface ConsentRequest {
 let counter = 0;
 const nextRequestId = () => `consent_${(counter += 1)}`;
 
-let pending: readonly ConsentRequest[] = [];
+/**
+ * One frozen empty array, shared. `getServerSnapshot` must return a referentially
+ * stable value: a fresh `[]` per call makes React believe the store changed on every
+ * render and it spins.
+ */
+const NO_REQUESTS: readonly ConsentRequest[] = Object.freeze([]);
+
+let pending: readonly ConsentRequest[] = NO_REQUESTS;
 const listeners = new Set<() => void>();
 
 function publish(next: readonly ConsentRequest[]): void {
@@ -56,7 +63,7 @@ function subscribe(listener: () => void): () => void {
 }
 
 const getSnapshot = () => pending;
-const getServerSnapshot = (): readonly ConsentRequest[] => [];
+const getServerSnapshot = () => NO_REQUESTS;
 
 /** The queue of requests waiting on a human. Empty on the server. */
 export function usePendingConsent(): readonly ConsentRequest[] {
@@ -66,7 +73,7 @@ export function usePendingConsent(): readonly ConsentRequest[] {
 /** Test seam. Drops every pending request as canceled. */
 export function resetConsentQueue(): void {
   const dropped = pending;
-  publish([]);
+  publish(NO_REQUESTS);
   for (const request of dropped) request.decide("canceled");
 }
 
@@ -123,6 +130,28 @@ export function consentRefusalResult(decision: ConsentDecision): CallToolResult 
 }
 
 /**
+ * Whether an agent-originated form submission still needs our gate.
+ *
+ * Chrome sets `SubmitEvent.agentInvoked` on a form the agent filled, even when a person
+ * pressed the button themselves. So `agentInvoked` alone is the wrong test: gating on it
+ * asks for approval a second time, right after the human check the platform already
+ * enforced.
+ *
+ * The real question is whether a human was in the loop at all, and the attribute that
+ * decides that is `toolautosubmit`. Without it the browser fills the form and waits for
+ * a person to submit, which is the consent event. With it the agent submits unattended,
+ * and our gate is the only thing standing there.
+ *
+ * See research/raw/spike-6-agentinvoked-on-human-submit.md.
+ */
+export function formSubmissionNeedsConsent(submission: {
+  agentInvoked: boolean;
+  autoSubmit: boolean;
+}): boolean {
+  return submission.agentInvoked && submission.autoSubmit;
+}
+
+/**
  * Wraps `execute` with the gate. Read-only tools are returned untouched, so they carry
  * no wrapper overhead and no chance of a stray prompt.
  */
@@ -166,7 +195,10 @@ export function ConsentGate() {
   return (
     <div className={styles.gate} role="alertdialog" aria-labelledby={`${request.id}_title`}>
       <p className={styles.gateTitle} id={`${request.id}_title`}>
-        An agent wants to run <strong>{request.title}</strong>.
+        An agent wants to run <strong>{request.title}</strong>.{" "}
+        {/* The machine name too: two tools on a page can share a human-facing title,
+            and the person approving needs to know which one is asking. */}
+        <span className={styles.gateToolName}>{request.toolName}</span>
       </p>
       <p className={styles.gateDescription}>{request.description}</p>
 

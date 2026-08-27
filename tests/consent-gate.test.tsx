@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ConsentGate,
   bypassesConsent,
+  formSubmissionNeedsConsent,
   requestConsent,
   resetConsentQueue,
   withConsent,
@@ -220,5 +221,22 @@ describe("queue", () => {
     expect(screen.getByText("first")).toBeInTheDocument();
     expect(screen.queryByText("second")).not.toBeInTheDocument();
     expect(screen.getByText(/1 more waiting/)).toBeInTheDocument();
+  });
+});
+
+describe("declarative form submissions", () => {
+  // Chrome sets agentInvoked on any form the agent filled, including ones a person then
+  // submits by hand. See research/raw/spike-6-declarative-form-consent.md.
+  it("does not gate an agent-filled form that a person submitted", () => {
+    expect(formSubmissionNeedsConsent({ agentInvoked: true, autoSubmit: false })).toBe(false);
+  });
+
+  it("gates a form the agent submits unattended", () => {
+    expect(formSubmissionNeedsConsent({ agentInvoked: true, autoSubmit: true })).toBe(true);
+  });
+
+  it("does not gate a submission no agent was involved in", () => {
+    expect(formSubmissionNeedsConsent({ agentInvoked: false, autoSubmit: false })).toBe(false);
+    expect(formSubmissionNeedsConsent({ agentInvoked: false, autoSubmit: true })).toBe(false);
   });
 });
