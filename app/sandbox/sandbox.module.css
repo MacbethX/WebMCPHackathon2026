@@ -1,13 +1,17 @@
 /* Retro personal shop. Beveled edges, system serif, one accent. Kept small. */
 
+/* Full-bleed paper, so the shop is not a card floating on the site background. */
+.page {
+  min-height: 100vh;
+  background: #f6efe2;
+  color: #241c14;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
 .shop {
   max-width: 42rem;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
-  font-family: Georgia, "Times New Roman", serif;
-  color: #241c14;
-  background: #f6efe2;
-  min-height: 100vh;
 }
 
 .header { border-bottom: 3px double #a08a63; padding-bottom: 1rem; margin-bottom: 1.75rem; }
@@ -56,7 +60,7 @@
   margin-bottom: 0.5rem;
   background: #fffdf7;
 }
-.entryName { font-weight: 700; margin-right: 0.5rem; }
+.entryName { font-weight: 700; margin-right: 0.4rem; }
 .entryName::after { content: " wrote:"; font-weight: 400; color: #6b5b45; }
 .entryMessage { color: #4c4034; }
 
