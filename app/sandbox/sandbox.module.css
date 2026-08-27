@@ -1,0 +1,122 @@
+/* Retro personal shop. Beveled edges, system serif, one accent. Kept small. */
+
+.shop {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #241c14;
+  background: #f6efe2;
+  min-height: 100vh;
+}
+
+.header { border-bottom: 3px double #a08a63; padding-bottom: 1rem; margin-bottom: 1.75rem; }
+.title { font-size: 2rem; margin: 0; letter-spacing: 0.02em; }
+.tagline { margin: 0.35rem 0 0.75rem; font-style: italic; color: #6b5b45; }
+
+.badgeOn, .badgeOff {
+  display: inline-block;
+  margin: 0;
+  padding: 0.25rem 0.6rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  border: 2px solid;
+}
+.badgeOn { border-color: #2f6b3a; color: #2f6b3a; background: #e4f0e2; }
+.badgeOff { border-color: #8a8175; color: #6b5b45; background: #ece5d8; }
+
+.heading {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #6b5b45;
+  margin: 2rem 0 0.75rem;
+}
+
+.products, .entries { list-style: none; margin: 0; padding: 0; }
+
+.product {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 0.85rem;
+  border: 2px solid #241c14;
+  box-shadow: 4px 4px 0 #c9b894;
+  background: #fffdf7;
+  margin-bottom: 0.9rem;
+}
+.emoji { font-size: 1.9rem; line-height: 1; }
+.productName { margin: 0 0 0.2rem; font-weight: 700; }
+.price { font-family: "Courier New", monospace; color: #9c3b1b; }
+.blurb { margin: 0; color: #4c4034; font-size: 0.95rem; }
+
+.entry {
+  padding: 0.5rem 0.7rem;
+  border-left: 4px solid #c9b894;
+  margin-bottom: 0.5rem;
+  background: #fffdf7;
+}
+.entryName { font-weight: 700; margin-right: 0.5rem; }
+.entryName::after { content: " wrote:"; font-weight: 400; color: #6b5b45; }
+.entryMessage { color: #4c4034; }
+
+.form {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 2px solid #241c14;
+  box-shadow: 4px 4px 0 #c9b894;
+  background: #fffdf7;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+  Declarative API pseudo-classes. While an agent is filling this form in, it says so.
+  Unknown selectors are dropped whole in browsers without the declarative API, so each
+  one is its own rule.
+*/
+.form:tool-form-active {
+  outline: 3px solid #2f6b3a;
+  outline-offset: 3px;
+  background: #f2f9f0;
+}
+.submit:tool-submit-active {
+  background: #2f6b3a;
+  color: #fffdf7;
+}
+
+.label {
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b5b45;
+  margin-bottom: 0.25rem;
+}
+.input, .textarea {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 2px inset #c9b894;
+  background: #fffdf7;
+  margin-bottom: 0.85rem;
+  color: inherit;
+}
+.textarea { resize: vertical; }
+
+.submit {
+  font: inherit;
+  align-self: flex-start;
+  padding: 0.45rem 1.4rem;
+  border: 2px outset #c9b894;
+  background: #e9dcc0;
+  color: #241c14;
+  cursor: pointer;
+}
+.submit:active { border-style: inset; }
+
+.notice {
+  margin: 0.75rem 0 0;
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  color: #9c3b1b;
+}
