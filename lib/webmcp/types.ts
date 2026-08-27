@@ -73,12 +73,24 @@ declare global {
       /**
        * Invokes a tool on behalf of an author-provided (in-page) agent. Spec-native
        * surface; the browser mediates and the call runs in the tool owner's context.
+       *
+       * Typed against observed Chrome behaviour, not against `webmcp-types`, which is
+       * wrong on all three points here. See
+       * research/raw/spike-4-executetool-string-arguments.md:
+       *
+       *   - `args` is a JSON string, not an object. Passing an object fails with
+       *     `UnknownError: Failed to parse input arguments`.
+       *   - `args` is required, not optional. Omitting it throws a TypeError.
+       *   - The result is a JSON string of a CallToolResult, not the object itself.
+       *
+       * `RegisteredTool.inputSchema` is likewise a JSON string despite being declared
+       * `object`. Reading `.properties` off it silently yields undefined.
        */
       executeTool(
         tool: WebMCP.RegisteredTool,
-        args?: Record<string, unknown>,
+        args: string,
         options?: { signal?: AbortSignal },
-      ): Promise<unknown>;
+      ): Promise<string>;
     }
 
     interface ModelContextEventMap {

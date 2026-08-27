@@ -49,7 +49,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 
 | Path | Purpose |
 |---|---|
-| `lib/webmcp/types.ts` | `CallToolResult`, `ToolSpec`, and the spec augmentations `webmcp-types` omits: `executeTool`, `SubmitEvent.respondWith`, declarative form attributes in JSX. |
+| `lib/webmcp/types.ts` | `CallToolResult`, `ToolSpec`, and the spec augmentations `webmcp-types` omits or gets wrong: `executeTool` (JSON strings in and out, see spike 4), `SubmitEvent.respondWith`, declarative form attributes in JSX. |
 | `lib/webmcp/budgets.ts` | The character budgets and the linter that enforces them. |
 | `lib/webmcp/tool-result.ts` | `CallToolResult` builders, bounded to the output budget. |
 | `lib/webmcp/registration-manager.tsx` | The only path to `registerTool`. Null-render component, one AbortController per tool, remount-safe. |
