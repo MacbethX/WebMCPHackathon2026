@@ -1,0 +1,165 @@
+/*
+  Styling for the consent gate and the receipt ledger. Self-contained rather than
+  supplied by the host page: these two are the part of Toolsmith that other sites are
+  meant to be able to take, and a component that arrives unstyled arrives broken.
+
+  Neutral on purpose. It borrows the host's font and sits on its own surface.
+*/
+
+.gate {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1000;
+  margin: 0 auto 1rem;
+  max-width: 28rem;
+  padding: 1rem 1.15rem;
+  border: 2px solid #241c14;
+  border-radius: 2px;
+  background: #fffdf7;
+  color: #241c14;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.28);
+  font-family: inherit;
+}
+
+.gateTitle {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.gateDescription {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #4c4034;
+}
+
+.args {
+  margin: 0 0 0.9rem;
+  padding: 0.6rem 0.7rem;
+  background: #f6efe2;
+  border-left: 3px solid #c9b894;
+  font-size: 0.85rem;
+}
+
+.argRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+.argRow + .argRow { margin-top: 0.3rem; }
+
+.argKey {
+  flex: 0 0 auto;
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b5b45;
+}
+
+.argValue {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.gateActions { display: flex; gap: 0.5rem; align-items: center; }
+
+.approve, .deny {
+  font: inherit;
+  padding: 0.4rem 1.1rem;
+  border: 2px solid #241c14;
+  cursor: pointer;
+}
+.approve { background: #2f6b3a; color: #fffdf7; border-color: #2f6b3a; }
+.deny { background: #fffdf7; color: #241c14; }
+
+.queueDepth {
+  margin: 0 0 0 auto;
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  color: #6b5b45;
+}
+
+/* ------------------------------------------------------------------ ledger */
+
+.ledger {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 2px solid #241c14;
+  box-shadow: 4px 4px 0 #c9b894;
+  background: #fffdf7;
+}
+
+.ledgerHead {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.ledgerKey {
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  color: #6b5b45;
+  margin: 0;
+}
+
+.export {
+  font: inherit;
+  margin-left: auto;
+  padding: 0.3rem 0.9rem;
+  border: 2px outset #c9b894;
+  background: #e9dcc0;
+  color: #241c14;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.export:active { border-style: inset; }
+.export:disabled { opacity: 0.5; cursor: default; }
+
+.empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b5b45;
+  font-style: italic;
+}
+
+.receipts { list-style: none; margin: 0; padding: 0; }
+
+.receipt {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  gap: 0.15rem 0.6rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid #e3d8c0;
+  font-size: 0.85rem;
+}
+
+.seq {
+  grid-row: span 3;
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  color: #6b5b45;
+  padding-top: 0.15rem;
+}
+
+.receiptLine { margin: 0; }
+.toolName { font-family: "Courier New", monospace; font-weight: 700; }
+.receiptMeta { margin: 0; font-size: 0.72rem; color: #6b5b45; }
+.receiptSummary { margin: 0; color: #4c4034; overflow-wrap: anywhere; }
+
+.consent {
+  display: inline-block;
+  padding: 0 0.35rem;
+  border: 1px solid currentColor;
+  font-family: "Courier New", monospace;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.consentApproved { color: #2f6b3a; }
+.consentDenied, .consentCanceled { color: #9c3b1b; }
+.consentNotRequired, .consentHumanSubmitted { color: #6b5b45; }
+
+.unsigned { color: #9c3b1b; }

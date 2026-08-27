@@ -53,8 +53,13 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/webmcp/budgets.ts` | The character budgets and the linter that enforces them. |
 | `lib/webmcp/tool-result.ts` | `CallToolResult` builders, bounded to the output budget. |
 | `lib/webmcp/registration-manager.tsx` | The only path to `registerTool`. Null-render component, one AbortController per tool, remount-safe. |
+| `lib/webmcp/consent-gate.tsx` | Promise-gated human approval around `execute`. Module-level store, because the browser calls `execute` from outside the React tree. Read-only tools bypass. |
+| `lib/webmcp/receipt-ledger.ts` | Append-only signed record of every call. Ed25519 via WebCrypto, session key, canonical JSON, verification and export. |
+| `lib/webmcp/receipt-ledger-panel.tsx` | Renders the ledger and exports it as JSON with the public key attached. |
+| `lib/webmcp/trust.ts` | Composes the gate and the ledger into `withTrust`, which is what the app wraps its tools in. |
+| `lib/webmcp/trust-layer.module.css` | Styling for the gate and the ledger. Self-contained, since these are the parts meant to be portable. |
 
-Arriving later: `consent-gate` and `receipt-ledger` (M2), `lib/generator/` (M3).
+Arriving later: `lib/generator/` (M3).
 
 ## `tests/`
 
@@ -66,3 +71,6 @@ Arriving later: `consent-gate` and `receipt-ledger` (M2), `lib/generator/` (M3).
 | `tests/budgets.test.ts` | Every budget at its limit and one past it. Asserts this repo's own tools pass. |
 | `tests/guestbook.test.ts` | Serialization, revalidation, ambiguity reporting, tool result shape. |
 | `tests/validate.test.ts` | The server boundary: rejects what the schema would have allowed. |
+| `tests/consent-gate.test.tsx` | Nothing runs before a human answers. Bypass, denial, withdrawal, queue depth. |
+| `tests/receipt-ledger.test.ts` | Signatures verify, tampering fails, canonical JSON is stable, secrets are redacted. |
+| `tests/trust.test.tsx` | The seam: read-only skips the gate but is still recorded, refusals leave verifiable receipts. |
