@@ -1,0 +1,5 @@
+# ChatGPT Sites (raw extract, learn.chatgpt.com/docs/sites, captured 2026-08-27)
+
+Public beta, Plus/Pro/Business/Enterprise/Edu; plan-specific usage limits across all Sites (limits can block creating a Site, adding storage, or KEEPING A HIGH-USAGE SITE PUBLIC). ChatGPT creates/hosts/refines/shares sites; every deployment URL is production; versions can be saved without deploying. URLs: <slug>.openai.chatgpt.site; changeable; custom domains where available (not Enterprise). Storage: D1 (10GB) relational + R2 objects; bindings in .openai/hosting.json. Sign in with ChatGPT via /signin-with-chatgpt path; identity forwarded as oai-authenticated-user-email / -full-name headers. Analytics built in. Restrictions: no PHI, no payment-card data, no financial transactions, no under-13 targeting. "Some frameworks, private networks, databases, background services, and hosting patterns aren't supported."
+
+Decision recorded 2026-08-27: rejected as primary host for the hackathon build (quota risk on deadline day, unclear response-header control vs the origin-isolation requirement, deployment via ChatGPT not git). Optional late-week mirror only.
