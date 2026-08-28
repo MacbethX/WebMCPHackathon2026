@@ -57,7 +57,10 @@ export interface JsonSchemaProperty {
   format?: string;
   pattern?: string;
   enum?: string[];
+  /** Chrome's synthesis shape: const/title branches alongside a redundant flat enum. */
   anyOf?: Array<{ type?: string; const: string; title?: string }>;
+  /** The idiomatic way to carry option labels. What our own emitter produces. */
+  oneOf?: Array<{ type?: string; const: string; title?: string }>;
   minLength?: number;
   maxLength?: number;
   minimum?: number;

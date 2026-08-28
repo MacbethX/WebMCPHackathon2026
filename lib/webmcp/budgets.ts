@@ -47,27 +47,50 @@ function check(
 }
 
 /**
- * Lints a tool declaration against every budget that applies before execution.
+ * The shape every budget check actually needs: a name, a description, and named
+ * parameters with descriptions. Both a live `ToolSpec` and a generated proposal reduce
+ * to this, so one implementation covers our own tools and everything the generator
+ * emits, which is what rule 5 asks for.
+ */
+export interface LintableDeclaration {
+  name: string;
+  description: string;
+  params: ReadonlyArray<{ name: string; description?: string }>;
+}
+
+/**
+ * Lints a declaration against every budget that applies before execution.
  * Output length is bounded separately, at result-construction time, by `boundText`.
  */
-export function lintToolSpec(spec: ToolSpec): BudgetViolation[] {
+export function lintDeclaration(declaration: LintableDeclaration): BudgetViolation[] {
   const violations: BudgetViolation[] = [];
 
-  check(violations, "toolName", spec.name, spec.name);
-  check(violations, "toolDescription", `${spec.name}.description`, spec.description);
+  check(violations, "toolName", declaration.name, declaration.name);
+  check(violations, "toolDescription", `${declaration.name}.description`, declaration.description);
 
-  const properties = spec.inputSchema?.properties ?? {};
-  for (const [paramName, property] of Object.entries(properties)) {
-    check(violations, "paramName", `${spec.name}.${paramName}`, paramName);
+  for (const param of declaration.params) {
+    check(violations, "paramName", `${declaration.name}.${param.name}`, param.name);
     check(
       violations,
       "paramDescription",
-      `${spec.name}.${paramName}.description`,
-      property.description,
+      `${declaration.name}.${param.name}.description`,
+      param.description,
     );
   }
 
   return violations;
+}
+
+/** Lints a tool this app is about to register. */
+export function lintToolSpec(spec: ToolSpec): BudgetViolation[] {
+  return lintDeclaration({
+    name: spec.name,
+    description: spec.description,
+    params: Object.entries(spec.inputSchema?.properties ?? {}).map(([name, property]) => ({
+      name,
+      description: property.description,
+    })),
+  });
 }
 
 /** Renders violations as one line each, for throwing or logging. */

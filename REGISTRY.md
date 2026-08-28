@@ -24,7 +24,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | Path | Purpose |
 |---|---|
 | `app/` | Next.js App Router. Pages, layout, API routes. |
-| `lib/` | Non-route code. Currently `lib/webmcp/` only; `lib/generator/` arrives in M3. |
+| `lib/` | Non-route code: `lib/webmcp/` (runtime) and `lib/generator/` (the builder's engine). |
 | `tests/` | Vitest suites and test doubles. |
 | `research/` | The pre-build research pack. Committed as-is: never edited, only appended to as new files. Excluded from lint and typecheck. |
 | `public/` | Static assets served at the root. |
@@ -59,7 +59,18 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/webmcp/trust.ts` | Composes the gate and the ledger into `withTrust`, which is what the app wraps its tools in. |
 | `lib/webmcp/trust-layer.module.css` | Styling for the gate and the ledger. Self-contained, since these are the parts meant to be portable. |
 
-Arriving later: `lib/generator/` (M3).
+## `lib/generator/`
+
+| Path | Purpose |
+|---|---|
+| `lib/generator/analyzed.ts` | What the analyzer extracts from markup. Plain data, no opinions. |
+| `lib/generator/html-analyzer.ts` | HTML to structure, via DOMParser. Groups radio sets, refuses password and file inputs. |
+| `lib/generator/proposal.ts` | The reviewable contract between analyzer, agent, human, and emitters. |
+| `lib/generator/consent-design.ts` | `toolautosubmit` modelled as a consent decision, not a boolean. Three named checkpoints, fail closed. |
+| `lib/generator/propose.ts` | Analysis to proposal: naming, drafting, and the declarative/imperative routing with stated reasons. |
+| `lib/generator/declarative-emitter.ts` | Annotated form markup, plus a prediction of the schema Chrome will synthesize from it, quirks included. |
+| `lib/generator/imperative-emitter.ts` | A standalone TypeScript module with real constraints, annotations, feature detection, and the spike 5 fallback. |
+| `lib/generator/generate.ts` | The pipeline, with the budget linter run before anything is emitted. |
 
 ## `tests/`
 
@@ -74,3 +85,7 @@ Arriving later: `lib/generator/` (M3).
 | `tests/consent-gate.test.tsx` | Nothing runs before a human answers. Bypass, denial, withdrawal, queue depth. |
 | `tests/receipt-ledger.test.ts` | Signatures verify, tampering fails, canonical JSON is stable, secrets are redacted. |
 | `tests/trust.test.tsx` | The seam: read-only skips the gate but is still recorded, refusals leave verifiable receipts. |
+| `tests/html-analyzer.test.ts` | Parsing: constraints, labels, radio grouping, and what it refuses to expose. |
+| `tests/consent-design.test.ts` | The consent decision: available choices, fail-closed defaults, refusing choices never offered. |
+| `tests/generator-golden.test.ts` | The M3 golden. Predicted declarative schema against the one Chrome actually produced in spike 2. |
+| `tests/emitted-code-compiles.test.ts` | Runs the real compiler over emitted modules in strict mode. Slow, and the most valuable test here. |
