@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "origin": "https://web-mcp-hackathon2026.vercel.app",
+  "path": "/sandbox",
+  "issuedAt": "2026-08-28T00:00:00.000Z",
+  "tools": [
+    {
+      "name": "add_to_guestbook",
+      "description": "Signs the shop's guestbook with a short public message. This changes the page: the entry appears immediately and is visible to everyone who visits. Ask the person before calling it.",
+      "inputSchemaHash": "f5aea53a332ffc6d6771435c87f4b159f3e5a9cbb4ac1bdcf520c1f5db9764f7",
+      "readOnlyHint": false,
+      "untrustedContentHint": true
+    },
+    {
+      "name": "list_products",
+      "description": "Lists everything for sale in this shop, with prices in US dollars. Optionally filters to items at or below a price. Read-only: it never changes anything.",
+      "inputSchemaHash": "c86413a301a8d7870a05f02d789717f8f3f1a2ff08f14678052cfc4f9395821b",
+      "readOnlyHint": true,
+      "untrustedContentHint": false
+    },
+    {
+      "name": "sign_guestbook",
+      "description": "Signs the guestbook of Andrew's Curio Shelf with a short public message. Changes the page: the entry becomes visible to every visitor.",
+      "inputSchemaHash": "6c7d7ba631305e6cf3d7e116a23a72a726cf680ca1e875ed3a0fc8ca50f54ff1",
+      "readOnlyHint": false,
+      "untrustedContentHint": false
+    }
+  ],
+  "algorithm": "Ed25519",
+  "publicKey": "shrlqxrw0x5WhLFZpTDh2hdfNqNRK2orA53K26sMuOs=",
+  "signature": "g6/yLwy8OTh0WiXzCQm9dERoCD7eJzM93YYBcNn4LA8hrGq7PElEU7hlBInw0e8JaIk01lRy4Fu2j1xXNkjQCQ=="
+}

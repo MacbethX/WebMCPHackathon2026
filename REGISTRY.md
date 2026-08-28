@@ -12,6 +12,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `REGISTRY.md` | This file. |
 | `LICENSE` | MIT. |
 | `.nvmrc` | Node 22. The floor is 20.9, set by Next 16. |
+| `scripts/` | `sign-manifest.mjs`, run by hand. Signing is publication, not a build step. |
 | `.env.local` | Local secrets. Never committed; `.gitignore` covers it via `.env*`. |
 | `package.json` | Dependencies and the four commands: `dev`, `build`, `lint`, `test`. |
 | `next.config.ts` | Response headers. Asserts `Origin-Agent-Cluster: ?1` for origin isolation. |
@@ -27,7 +28,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/` | Non-route code: `lib/webmcp/` (runtime) and `lib/generator/` (the builder's engine). |
 | `tests/` | Vitest suites and test doubles. |
 | `research/` | The pre-build research pack. Committed as-is: never edited, only appended to as new files. Excluded from lint and typecheck. |
-| `public/` | Static assets served at the root. |
+| `public/` | Static assets, including `sandbox-tools.manifest.json`, the signed tool list. |
 | `docs/` | Images the README embeds. Nothing here is code. |
 
 ## `app/`
@@ -67,6 +68,8 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/webmcp/agent-client.ts` | The only place that touches `getTools`/`executeTool`. Converts the JSON strings the real API uses (spike 4). |
 | `lib/webmcp/use-registered-tools.ts` | The page's tool list, kept current by `toolchange` rather than polling. |
 | `lib/webmcp/records.ts` | `emptyRecord`, for maps keyed by someone else's strings. A plain `{}` loses a key named `__proto__`. |
+| `lib/webmcp/manifest.ts` | The signed tool manifest: hashing, signing, verification, and comparison against the live tool list. |
+| `lib/webmcp/manifest-badge.tsx` | The badge. States plainly what a signature proves and what it does not. |
 
 ## `lib/generator/`
 
@@ -114,3 +117,4 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `tests/hardening.test.ts` | Empty, enormous, repetitive, and broken input. Name collisions across forms. |
 | `tests/bundle.test.ts` | The archive, checked by the real `unzip` rather than by its own reader. |
 | `tests/live-tool.test.ts` | A value the control refuses is reported as refused, not as filled. |
+| `tests/manifest.test.ts` | Tampering, forged keys, wrong origin, and injected tools. The badge has to refuse. |

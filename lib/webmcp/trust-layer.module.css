@@ -171,3 +171,31 @@
 .consentNotRequired, .consentHumanSubmitted { color: #6b5b45; }
 
 .unsigned { color: #9c3b1b; }
+
+/* ---------------------------------------------------------------- manifest */
+
+.manifest {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid;
+  background: #fffdf7;
+}
+
+.badgeVerified { border-color: #2f6b3a; background: #f0f7ee; }
+.badgeAlarm { border-color: #9c3b1b; background: #f9ece6; }
+.badgeUnknown { border-color: #8a8175; background: #f2ede2; }
+
+.manifestHeadline { margin: 0 0 0.35rem; font-weight: 700; font-size: 0.95rem; }
+.manifestDetail { margin: 0; font-size: 0.85rem; color: #4c4034; }
+.manifestList { margin: 0; padding-left: 1.1rem; font-size: 0.85rem; color: #7a2d14; }
+
+/*
+  The limit, stated on the badge rather than in a doc nobody opens. A green tick that
+  overclaims is worse than no tick.
+*/
+.manifestKey {
+  margin: 0.55rem 0 0;
+  font-size: 0.74rem;
+  color: #6b5b45;
+  line-height: 1.45;
+}

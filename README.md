@@ -52,6 +52,24 @@ Every one of these is a thing I found by running the browser, written up in `res
 - **I read the vercel/shop WebMCP PR before writing a line**: bounded outputs, redacted results, server-side revalidation, mutations reported unsafe-to-retry on ambiguity. Stolen wholesale ([saga](research/raw/vercel-shop-saga.md)).
 - Chrome's published character budgets (30/500/150/1500) are enforced by a linter on everything the generator emits, because a 900-character tool description is a bug.
 
+## The signed manifest
+
+A page can register any tool at any moment, and a visitor cannot tell an author's tool from one an extension, an injected script, or a compromised bundle put there. So the sandbox publishes a signed list of what it is supposed to offer, and the badge compares the live tools against it.
+
+![The badge catching a tool that was registered on the page but never published](docs/images/04-manifest-mismatch.jpg)
+
+What a green badge means: the page matches its own published list, and the list has not been edited by anyone without the signing key. What it does not mean: anything about who signed it. The public key travels inside the manifest, so whoever can replace the file can replace the key and re-sign. The badge says that on its face, and shows the fingerprint so you can compare it against one you already hold.
+
+That limit is real, and stating it is the difference between a security feature and a green tick that teaches people to trust the wrong thing. What the manifest genuinely catches is a tool appearing, disappearing, or changing its description out from under a page whose author published a list, and a tool's description is exactly what an agent acts on.
+
+Signing is a separate command, not part of `build`:
+
+```bash
+TOOLSMITH_SIGNING_KEY=... npm run sign-manifest
+```
+
+With no key set it generates one, prints it, and refuses to write anything. A manifest signed by a key that existed for one run proves nothing on the next deploy.
+
 ## What signing the ledger does and doesn't buy
 
 Every tool call appends a receipt, approved or refused, signed Ed25519 with a keypair generated for the session and never persisted. That proves the ledger was not edited after the fact by something without the private key. It does not prove the page told the truth when it wrote the entry. Nothing app-side can prove that, and claiming otherwise would be the same kind of overreach as claiming prompt injection is solved.

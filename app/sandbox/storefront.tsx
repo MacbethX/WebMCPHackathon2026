@@ -39,6 +39,7 @@ import {
   requestConsent,
 } from "@/lib/webmcp/consent-gate";
 import { appendReceipt } from "@/lib/webmcp/receipt-ledger";
+import { ToolManifestBadge } from "@/lib/webmcp/manifest-badge";
 import { ReceiptLedgerPanel } from "@/lib/webmcp/receipt-ledger-panel";
 import { summarize, withTrust } from "@/lib/webmcp/trust";
 import type { ConsentStatus } from "@/lib/webmcp/receipt-ledger";
@@ -301,6 +302,17 @@ export default function Storefront() {
             a key generated for this browsing session and thrown away when you leave.
           </p>
           <ReceiptLedgerPanel />
+        </section>
+
+        <section aria-labelledby="manifest">
+          <h2 id="manifest" className={styles.heading}>
+            Published tools
+          </h2>
+          <p className={styles.receiptsNote}>
+            What this shop says it offers, signed, so you can tell an author&apos;s tool from
+            one something else put here.
+          </p>
+          <ToolManifestBadge manifestUrl="/sandbox-tools.manifest.json" />
         </section>
       </div>
 
