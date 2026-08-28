@@ -12,6 +12,7 @@
  * secure-tools guidance asks for, and the README says it in those words.
  */
 
+import { emptyRecord } from "./records";
 import type { ConsentDecision } from "./consent-gate";
 
 /** How consent was obtained, or why it was not needed. */
@@ -184,7 +185,7 @@ function truncate(value: string): string {
  * shortening the rest. Nothing here is a trust boundary; it is a log hygiene pass.
  */
 export function redactArgs(args: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
+  const out = emptyRecord<unknown>();
   for (const [key, value] of Object.entries(args)) {
     if (SECRET_KEY_PATTERN.test(key)) {
       out[key] = "[redacted]";

@@ -22,6 +22,7 @@
  */
 
 import { BUDGETS } from "../webmcp/budgets";
+import { emptyRecord } from "../webmcp/records";
 import { requiresConsentGate } from "./consent-design";
 import { CHROME_TIME_FORMAT } from "./declarative-emitter";
 import type { AnalyzedControl } from "./analyzed";
@@ -116,7 +117,7 @@ export function toSchemaProperty(
 }
 
 export function buildSchema(proposal: ToolProposal): JsonSchemaObject {
-  const properties: Record<string, JsonSchemaProperty> = {};
+  const properties = emptyRecord<JsonSchemaProperty>();
   const required: string[] = [];
 
   for (const param of proposal.params) {

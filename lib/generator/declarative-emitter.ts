@@ -21,6 +21,7 @@
  */
 
 import { emitsAutoSubmit } from "./consent-design";
+import { emptyRecord } from "../webmcp/records";
 import { droppedConstraints } from "./propose";
 import type { AnalyzedControl } from "./analyzed";
 import type { JsonSchemaObject, JsonSchemaProperty } from "../webmcp/types";
@@ -74,7 +75,7 @@ export function predictProperty(
 
 /** The schema Chrome will synthesize from the annotated form. */
 export function predictSchema(proposal: ToolProposal): JsonSchemaObject {
-  const properties: Record<string, JsonSchemaProperty> = {};
+  const properties = emptyRecord<JsonSchemaProperty>();
   const required: string[] = [];
 
   for (const param of proposal.params) {

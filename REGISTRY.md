@@ -28,6 +28,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `tests/` | Vitest suites and test doubles. |
 | `research/` | The pre-build research pack. Committed as-is: never edited, only appended to as new files. Excluded from lint and typecheck. |
 | `public/` | Static assets served at the root. |
+| `docs/` | Images the README embeds. Nothing here is code. |
 
 ## `app/`
 
@@ -65,6 +66,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/webmcp/trust-layer.module.css` | Styling for the gate and the ledger. Self-contained, since these are the parts meant to be portable. |
 | `lib/webmcp/agent-client.ts` | The only place that touches `getTools`/`executeTool`. Converts the JSON strings the real API uses (spike 4). |
 | `lib/webmcp/use-registered-tools.ts` | The page's tool list, kept current by `toolchange` rather than polling. |
+| `lib/webmcp/records.ts` | `emptyRecord`, for maps keyed by someone else's strings. A plain `{}` loses a key named `__proto__`. |
 
 ## `lib/generator/`
 
@@ -79,7 +81,9 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/generator/imperative-emitter.ts` | A standalone TypeScript module with real constraints, annotations, feature detection, and the spike 5 fallback. |
 | `lib/generator/generate.ts` | The pipeline, with the budget linter run before anything is emitted. |
 | `lib/generator/sanitize.ts` | Allowlist sanitizer for pasted markup, which the builder renders inside our origin. |
-| `lib/generator/live-tool.ts` | An approved proposal as a running tool, acting on the preview form. |
+| `lib/generator/live-tool.ts` | An approved proposal as a running tool, acting on the preview form. Reads back every write, so a refused value is never reported as filled. |
+| `lib/generator/zip.ts` | A store-only ZIP writer. No dependency, and the tests hand its output to the real `unzip`. |
+| `lib/generator/bundle.ts` | The export bundle: emitted code, a README, and the consent record. |
 
 ## `lib/agent/`
 
@@ -107,3 +111,6 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `tests/emitted-code-compiles.test.ts` | Runs the real compiler over emitted modules in strict mode. Slow, and the most valuable test here. |
 | `tests/sanitize.test.ts` | Written as attacks, not features. A pass means the attack did not work. |
 | `tests/agent-client.test.ts` | The JSON-string conversions from spike 4, against a fake that rejects object arguments like Chrome does. |
+| `tests/hardening.test.ts` | Empty, enormous, repetitive, and broken input. Name collisions across forms. |
+| `tests/bundle.test.ts` | The archive, checked by the real `unzip` rather than by its own reader. |
+| `tests/live-tool.test.ts` | A value the control refuses is reported as refused, not as filled. |

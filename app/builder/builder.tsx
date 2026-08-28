@@ -17,7 +17,8 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { generate, regenerate } from "@/lib/generator/generate";
+import { buildBundle, bundleFileName } from "@/lib/generator/bundle";
+import { checkInput, generate, regenerate } from "@/lib/generator/generate";
 import { annotateForm } from "@/lib/generator/declarative-emitter";
 import { buildLiveTool } from "@/lib/generator/live-tool";
 import { sanitizeHtml } from "@/lib/generator/sanitize";
@@ -69,10 +70,12 @@ export default function Builder() {
     setApproved({});
 
     const source = pasted.trim();
-    if (!source) {
+    const refusal = checkInput(source);
+    if (refusal) {
       setSanitized(null);
       setGenerated([]);
-      setNotice("Paste some HTML first.");
+      setFormSources([]);
+      setNotice(refusal);
       return;
     }
 
@@ -223,6 +226,31 @@ export default function Builder() {
     [generated, sanitized, updateProposal],
   );
 
+  /**
+   * The approved tools, as a zip.
+   *
+   * Only approved ones: the bundle is a record of what a person signed off, not of what
+   * the generator happened to produce.
+   */
+  const exportBundle = useCallback(() => {
+    const approvedNames = new Set(Object.keys(approved));
+    const tools = generated.filter((entry) => approvedNames.has(entry.proposal.name));
+    if (tools.length === 0) return;
+
+    const generatedAt = new Date();
+    const bytes = buildBundle({ tools, generatedAt });
+    // Copied into a fresh buffer: Blob wants an ArrayBuffer, and the typed array's own
+    // buffer may be a view into a larger one.
+    const blob = new Blob([bytes.slice().buffer as ArrayBuffer], { type: "application/zip" });
+
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = bundleFileName(generatedAt);
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }, [approved, generated]);
+
   /** Approved imperative tools, wrapped in the trust layer and registered for real. */
   const liveSpecs = useMemo(
     () =>
@@ -295,6 +323,14 @@ export default function Builder() {
             {generated.length > 0 ? (
               <section>
                 <h2 className={styles.heading}>2. Review and approve</h2>
+                {Object.keys(approved).length > 0 ? (
+                  <div className={styles.actions}>
+                    <button className={styles.secondary} type="button" onClick={exportBundle}>
+                      Download {Object.keys(approved).length} approved tool
+                      {Object.keys(approved).length === 1 ? "" : "s"} as a zip
+                    </button>
+                  </div>
+                ) : null}
                 {generated.map((entry, index) => (
                   <ProposalCard
                     key={entry.proposal.source.id ?? index}

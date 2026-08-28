@@ -6,7 +6,7 @@
  * own tools, and a linter that runs after the code exists is a linter people paste past.
  */
 
-import { formatViolations, lintDeclaration } from "../webmcp/budgets";
+import { BUDGETS, formatViolations, lintDeclaration } from "../webmcp/budgets";
 import { analyzeHtml, parseFormElement } from "./html-analyzer";
 import { emitDeclarative } from "./declarative-emitter";
 import { emitImperative } from "./imperative-emitter";
@@ -15,6 +15,52 @@ import type { BudgetViolation } from "../webmcp/budgets";
 import type { DeclarativeEmission } from "./declarative-emitter";
 import type { ImperativeEmission } from "./imperative-emitter";
 import type { ToolProposal } from "./proposal";
+
+/**
+ * Caps on what will be processed.
+ *
+ * Not security boundaries: the sanitizer is that. These stop a page that is merely
+ * enormous from locking the tab up while the parser walks it, and they are stated as
+ * numbers a person can read rather than discovered as a hang.
+ */
+export const INPUT_LIMITS = {
+  /** Characters of pasted HTML. Roughly a very large page. */
+  maxCharacters: 400_000,
+  /** Forms processed from one paste. */
+  maxForms: 25,
+} as const;
+
+/** A reason the input will not be processed, or null when it is fine. */
+export function checkInput(html: string): string | null {
+  if (html.trim().length === 0) return "Paste some HTML first.";
+  if (html.length > INPUT_LIMITS.maxCharacters) {
+    return `That is ${html.length.toLocaleString()} characters, over the ${INPUT_LIMITS.maxCharacters.toLocaleString()} limit. Paste the part of the page with the form in it rather than the whole document.`;
+  }
+  return null;
+}
+
+/**
+ * Makes every name in a batch unique.
+ *
+ * Two forms on a page routinely share a submit label ("Sign up" on both a newsletter
+ * box and a waitlist), and the label is where a name comes from. Registering two tools
+ * under one name means an agent cannot address either of them reliably, so the
+ * duplicates are numbered. Refitted to the budget afterwards, since the suffix can push
+ * a name over.
+ */
+export function deduplicateNames(names: readonly string[]): string[] {
+  const seen = new Map<string, number>();
+
+  return names.map((name) => {
+    const count = seen.get(name) ?? 0;
+    seen.set(name, count + 1);
+    if (count === 0) return name;
+
+    const suffix = `_${count + 1}`;
+    const trimmed = name.slice(0, Math.max(0, BUDGETS.toolName - suffix.length));
+    return `${trimmed}${suffix}`;
+  });
+}
 
 export interface GeneratedTool {
   proposal: ToolProposal;
@@ -42,10 +88,13 @@ export function lintProposal(proposal: ToolProposal): BudgetViolation[] {
  * see what went wrong and fix the description rather than wonder where their form went.
  */
 export function generate(html: string): GeneratedTool[] {
-  const forms = analyzeHtml(html);
+  const forms = analyzeHtml(html).slice(0, INPUT_LIMITS.maxForms);
 
-  return forms.map((form, index) => {
-    const proposal = proposeForForm(form);
+  const proposals = forms.map(proposeForForm);
+  const names = deduplicateNames(proposals.map((proposal) => proposal.name));
+
+  return proposals.map((draft, index) => {
+    const proposal = names[index] === draft.name ? draft : { ...draft, name: names[index] };
     const violations = lintProposal(proposal);
 
     if (violations.length > 0) {
