@@ -127,6 +127,16 @@ describe("what it keeps", () => {
     expect(html).toContain("<button");
   });
 
+  it("keeps method, which is how a query is told from a change", () => {
+    // Stripping it would make every pasted form look mutating, and a GET search form
+    // would never get readOnlyHint. Safe with `action` gone: method alone navigates
+    // nowhere.
+    const html = clean('<form method="get" action="https://evil.test"><input name="q"></form>');
+
+    expect(html).toContain('method="get"');
+    expect(html).not.toContain("evil.test");
+  });
+
   it("keeps existing WebMCP annotations, so annotated markup survives a round trip", () => {
     const html = clean(
       '<form toolname="book" tooldescription="Books a table" toolautosubmit>' +

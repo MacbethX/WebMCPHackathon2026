@@ -34,10 +34,15 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | Path | Purpose |
 |---|---|
 | `app/layout.tsx` | Root layout. |
-| `app/page.tsx` | Placeholder for the builder UI (M4). Points at the sandbox. |
+| `app/page.tsx` | The builder, at the root. |
 | `app/globals.css` | Base styles. |
-| `app/page.module.css` | Styles for the placeholder home page. |
+| `app/builder/builder.tsx` | The loop: paste, sanitize, propose, review, approve, register live. |
+| `app/builder/proposal-card.tsx` | One proposal to read, edit, and approve. Renders the consent question from data, never as a checkbox. |
+| `app/builder/agent-panel.tsx` | The in-page agent. Discovers via `getTools`, invokes via `executeTool`, never calls a tool function directly. |
+| `app/builder/sample.ts` | A plain unannotated form to try the builder on. |
+| `app/builder/builder.module.css` | Builder styling, including the pseudo-classes applied to pasted forms. |
 | `app/api/validate/route.ts` | Server-side revalidation for sandbox mutations. The trust boundary. |
+| `app/api/agent/route.ts` | The model proxy. Refines prose, or picks a tool. Never runs one. Key stays server-side. |
 | `app/sandbox/page.tsx` | Sandbox route. Server component, metadata only. |
 | `app/sandbox/storefront.tsx` | The shop UI, guestbook state, and the declarative `sign_guestbook` form. |
 | `app/sandbox/tools.ts` | The two imperative tool declarations: `list_products`, `add_to_guestbook`. |
@@ -58,6 +63,8 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/webmcp/receipt-ledger-panel.tsx` | Renders the ledger and exports it as JSON with the public key attached. |
 | `lib/webmcp/trust.ts` | Composes the gate and the ledger into `withTrust`, which is what the app wraps its tools in. |
 | `lib/webmcp/trust-layer.module.css` | Styling for the gate and the ledger. Self-contained, since these are the parts meant to be portable. |
+| `lib/webmcp/agent-client.ts` | The only place that touches `getTools`/`executeTool`. Converts the JSON strings the real API uses (spike 4). |
+| `lib/webmcp/use-registered-tools.ts` | The page's tool list, kept current by `toolchange` rather than polling. |
 
 ## `lib/generator/`
 
@@ -71,6 +78,15 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `lib/generator/declarative-emitter.ts` | Annotated form markup, plus a prediction of the schema Chrome will synthesize from it, quirks included. |
 | `lib/generator/imperative-emitter.ts` | A standalone TypeScript module with real constraints, annotations, feature detection, and the spike 5 fallback. |
 | `lib/generator/generate.ts` | The pipeline, with the budget linter run before anything is emitted. |
+| `lib/generator/sanitize.ts` | Allowlist sanitizer for pasted markup, which the builder renders inside our origin. |
+| `lib/generator/live-tool.ts` | An approved proposal as a running tool, acting on the preview form. |
+
+## `lib/agent/`
+
+| Path | Purpose |
+|---|---|
+| `lib/agent/contract.ts` | The wire format between page and proxy. The model decides; it never acts. |
+| `lib/agent/provider.ts` | The model adapter. Anthropic is the exercised path; the OpenAI branch is written to spec and unverified. |
 
 ## `tests/`
 
@@ -89,3 +105,5 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `tests/consent-design.test.ts` | The consent decision: available choices, fail-closed defaults, refusing choices never offered. |
 | `tests/generator-golden.test.ts` | The M3 golden. Predicted declarative schema against the one Chrome actually produced in spike 2. |
 | `tests/emitted-code-compiles.test.ts` | Runs the real compiler over emitted modules in strict mode. Slow, and the most valuable test here. |
+| `tests/sanitize.test.ts` | Written as attacks, not features. A pass means the attack did not work. |
+| `tests/agent-client.test.ts` | The JSON-string conversions from spike 4, against a fake that rejects object arguments like Chrome does. |

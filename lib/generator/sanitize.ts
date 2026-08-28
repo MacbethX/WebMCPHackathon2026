@@ -43,7 +43,9 @@ const GLOBAL_ATTRIBUTES = new Set([
 
 /** Attributes kept, per element. */
 const ELEMENT_ATTRIBUTES: Record<string, Set<string>> = {
-  form: new Set(["accept-charset", "autocomplete", "novalidate", "name"]),
+  // `method` is kept: it is how the analyzer tells a query from a change, and with
+  // `action` stripped it cannot navigate anywhere on its own.
+  form: new Set(["method", "accept-charset", "autocomplete", "novalidate", "name"]),
   input: new Set([
     "type", "name", "value", "placeholder", "required", "disabled", "readonly",
     "checked", "min", "max", "step", "minlength", "maxlength", "pattern",

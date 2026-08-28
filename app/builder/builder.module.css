@@ -1,0 +1,192 @@
+/* The builder. Two columns on a wide screen, stacked below it. */
+
+.page {
+  min-height: 100vh;
+  background: #f6efe2;
+  color: #241c14;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.shell {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 5rem;
+}
+
+.header { border-bottom: 3px double #a08a63; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.title { font-size: 2rem; margin: 0; }
+.tagline { margin: 0.35rem 0 0.75rem; font-style: italic; color: #6b5b45; }
+
+.statusRow { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+.badge, .badgeOff, .badgeWarn {
+  display: inline-block;
+  margin: 0;
+  padding: 0.25rem 0.6rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.72rem;
+  border: 2px solid;
+}
+.badge { border-color: #2f6b3a; color: #2f6b3a; background: #e4f0e2; }
+.badgeOff { border-color: #8a8175; color: #6b5b45; background: #ece5d8; }
+.badgeWarn { border-color: #9c3b1b; color: #9c3b1b; background: #f6e6df; }
+
+.columns { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+@media (min-width: 62rem) { .columns { grid-template-columns: 1.05fr 1fr; } }
+
+.heading {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #6b5b45;
+  margin: 0 0 0.6rem;
+}
+
+.panel {
+  border: 2px solid #241c14;
+  box-shadow: 4px 4px 0 #c9b894;
+  background: #fffdf7;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.paste {
+  font: inherit;
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  width: 100%;
+  min-height: 9rem;
+  padding: 0.6rem;
+  border: 2px inset #c9b894;
+  background: #fffdf7;
+  color: inherit;
+  resize: vertical;
+}
+
+.actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.75rem; }
+
+.primary, .secondary, .approve, .revoke, .small {
+  font: inherit;
+  cursor: pointer;
+  border: 2px solid #241c14;
+  padding: 0.4rem 1.1rem;
+}
+.primary { background: #241c14; color: #fffdf7; }
+.secondary { background: #e9dcc0; color: #241c14; }
+.approve { background: #2f6b3a; color: #fffdf7; border-color: #2f6b3a; }
+.revoke { background: #fffdf7; color: #9c3b1b; border-color: #9c3b1b; }
+.small { padding: 0.2rem 0.6rem; font-size: 0.78rem; background: #fffdf7; }
+.primary:disabled, .secondary:disabled, .approve:disabled { opacity: 0.45; cursor: default; }
+
+.note { margin: 0.6rem 0 0; font-size: 0.82rem; color: #4c4034; }
+.error { margin: 0.6rem 0 0; font-size: 0.82rem; color: #9c3b1b; }
+.mono { font-family: "Courier New", monospace; font-size: 0.75rem; }
+
+/* ---------------------------------------------------------------- proposal */
+
+.proposal { border: 2px solid #241c14; background: #fffdf7; padding: 0.9rem; margin-bottom: 1rem; }
+.proposalApproved { border-color: #2f6b3a; box-shadow: 4px 4px 0 #cfe3cb; }
+
+.proposalHead { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.toolName { font-family: "Courier New", monospace; font-weight: 700; font-size: 0.95rem; margin: 0; }
+.routeTag {
+  font-family: "Courier New", monospace;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid currentColor;
+  padding: 0 0.35rem;
+  color: #6b5b45;
+}
+
+.field { display: block; margin-bottom: 0.7rem; }
+.label {
+  display: block;
+  font-family: "Courier New", monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b5b45;
+  margin-bottom: 0.2rem;
+}
+.input, .textarea {
+  font: inherit;
+  font-size: 0.88rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 2px inset #c9b894;
+  background: #fffdf7;
+  color: inherit;
+}
+.textarea { resize: vertical; min-height: 3.6rem; }
+.counter { float: right; font-family: "Courier New", monospace; font-size: 0.66rem; color: #6b5b45; }
+.counterOver { color: #9c3b1b; font-weight: 700; }
+
+.params { border-left: 3px solid #c9b894; padding-left: 0.7rem; margin: 0.5rem 0 0.8rem; }
+.paramMeta { font-family: "Courier New", monospace; font-size: 0.66rem; color: #6b5b45; }
+
+.reasons { margin: 0 0 0.7rem; padding-left: 1.1rem; font-size: 0.8rem; color: #4c4034; }
+.warnings { margin: 0 0 0.7rem; padding-left: 1.1rem; font-size: 0.8rem; color: #9c3b1b; }
+
+/* The consent question. Deliberately not a checkbox: see consent-design.ts. */
+.consent { border: 2px solid #a08a63; background: #f6efe2; padding: 0.7rem; margin-bottom: 0.8rem; }
+.consentQuestion { margin: 0 0 0.5rem; font-weight: 700; font-size: 0.9rem; }
+.choice { display: block; margin-bottom: 0.45rem; font-size: 0.84rem; cursor: pointer; }
+.choiceDisabled { display: block; margin-bottom: 0.45rem; font-size: 0.84rem; opacity: 0.6; }
+.choiceLabel { font-weight: 700; }
+.choiceConsequence { display: block; margin-left: 1.4rem; color: #4c4034; font-size: 0.8rem; }
+
+.emission { margin-top: 0.7rem; }
+.code {
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  white-space: pre;
+  overflow-x: auto;
+  background: #f6efe2;
+  border: 1px solid #c9b894;
+  padding: 0.6rem;
+  margin: 0.3rem 0 0;
+  max-height: 18rem;
+}
+.losses { margin: 0.4rem 0 0; padding-left: 1.1rem; font-size: 0.78rem; color: #9c3b1b; }
+
+/* ----------------------------------------------------------------- preview */
+
+.preview { border: 2px dashed #a08a63; padding: 0.9rem; background: #fffdf7; }
+.preview form { border: 1px solid #e3d8c0; padding: 0.7rem; }
+.preview label { display: block; font-size: 0.8rem; color: #6b5b45; margin-top: 0.5rem; }
+.preview input, .preview select, .preview textarea {
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.3rem 0.45rem;
+  border: 2px inset #c9b894;
+  background: #fffdf7;
+  max-width: 100%;
+}
+.preview button { font: inherit; margin-top: 0.7rem; padding: 0.3rem 0.9rem; border: 2px outset #c9b894; background: #e9dcc0; }
+
+/* The declarative pseudo-classes, on whatever gets pasted in. */
+.preview form:tool-form-active { outline: 3px solid #2f6b3a; outline-offset: 3px; background: #f2f9f0; }
+.preview button:tool-submit-active { background: #2f6b3a; color: #fffdf7; }
+
+/* ------------------------------------------------------------- agent panel */
+
+.toolList { list-style: none; margin: 0 0 0.8rem; padding: 0; }
+.toolRow { padding: 0.4rem 0; border-top: 1px solid #e3d8c0; font-size: 0.84rem; }
+.toolRow:first-child { border-top: none; }
+
+.ask { display: flex; gap: 0.5rem; }
+.ask .input { flex: 1; }
+
+.transcript { list-style: none; margin: 0.8rem 0 0; padding: 0; }
+.turn { padding: 0.5rem 0; border-top: 1px solid #e3d8c0; font-size: 0.85rem; }
+.turnRole {
+  font-family: "Courier New", monospace;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b5b45;
+  display: block;
+}
+.turnBody { margin: 0.15rem 0 0; overflow-wrap: anywhere; }
+.turnError { color: #9c3b1b; }
