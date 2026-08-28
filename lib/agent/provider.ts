@@ -24,6 +24,13 @@ export interface ProviderConfig {
   provider: ProviderName;
   apiKey: string | null;
   model: string;
+  /**
+   * Anthropic only. An identity-linked API key is scoped to an organization rather than
+   * a workspace, and the API rejects it with a 400 unless the request names the
+   * workspace it acts in. The SDK reads `ANTHROPIC_WORKSPACE_ID` for its own credential
+   * flows but does not apply it to a plain API key, so it is sent as a header here.
+   */
+  workspaceId: string | null;
 }
 
 /** Claude Opus 5. Changing this is a deliberate act, not a default that drifted. */
@@ -34,8 +41,18 @@ export function readProviderConfig(env: NodeJS.ProcessEnv = process.env): Provid
   const provider: ProviderName = env.MODEL_PROVIDER === "openai" ? "openai" : "anthropic";
 
   return provider === "openai"
-    ? { provider, apiKey: env.OPENAI_API_KEY?.trim() || null, model: env.OPENAI_MODEL?.trim() || OPENAI_MODEL }
-    : { provider, apiKey: env.ANTHROPIC_API_KEY?.trim() || null, model: env.ANTHROPIC_MODEL?.trim() || ANTHROPIC_MODEL };
+    ? {
+        provider,
+        apiKey: env.OPENAI_API_KEY?.trim() || null,
+        model: env.OPENAI_MODEL?.trim() || OPENAI_MODEL,
+        workspaceId: null,
+      }
+    : {
+        provider,
+        apiKey: env.ANTHROPIC_API_KEY?.trim() || null,
+        model: env.ANTHROPIC_MODEL?.trim() || ANTHROPIC_MODEL,
+        workspaceId: env.ANTHROPIC_WORKSPACE_ID?.trim() || null,
+      };
 }
 
 export interface CompletionRequest<T> {
@@ -68,7 +85,12 @@ async function completeWithAnthropic<T>(
   config: ProviderConfig,
   request: CompletionRequest<T>,
 ): Promise<T> {
-  const client = new Anthropic({ apiKey: config.apiKey ?? undefined });
+  const client = new Anthropic({
+    apiKey: config.apiKey ?? undefined,
+    ...(config.workspaceId
+      ? { defaultHeaders: { "anthropic-workspace-id": config.workspaceId } }
+      : {}),
+  });
 
   let response;
   try {
@@ -107,6 +129,14 @@ async function completeWithAnthropic<T>(
 }
 
 function translateAnthropicError(cause: unknown): ProviderError {
+  // Logged server-side, never returned. The operator needs the real message to fix a
+  // misconfiguration; the caller must not receive upstream error text (rule 7).
+  if (cause instanceof Anthropic.APIError) {
+    console.error("[toolsmith] anthropic error", cause.status, cause.message);
+  } else {
+    console.error("[toolsmith] anthropic request failed", cause);
+  }
+
   if (cause instanceof Anthropic.AuthenticationError) {
     return new ProviderError("The Anthropic API key was rejected.", true);
   }
@@ -114,8 +144,16 @@ function translateAnthropicError(cause: unknown): ProviderError {
     return new ProviderError("The model is rate limited right now. Try again shortly.");
   }
   if (cause instanceof Anthropic.APIError) {
-    // The upstream message is not passed on: rule 7 keeps raw upstream error text out
-    // of anything a caller sees, and it routinely carries request details.
+    // One 400 is worth naming, because it is a setup problem with an exact fix rather
+    // than a fault. An identity-linked key must say which workspace it acts in.
+    if (cause.status === 400 && /anthropic-workspace-id/i.test(cause.message)) {
+      return new ProviderError(
+        "This Anthropic key is identity-linked, so it needs a workspace. Set ANTHROPIC_WORKSPACE_ID to the workspace id from console.anthropic.com/settings/workspaces.",
+        true,
+      );
+    }
+    // Otherwise the upstream message is not passed on: rule 7 keeps raw upstream error
+    // text out of anything a caller sees, and it routinely carries request details.
     return new ProviderError(`The model service returned an error (HTTP ${cause.status}).`);
   }
   return new ProviderError("The model service could not be reached.");
