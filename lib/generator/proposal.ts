@@ -54,5 +54,13 @@ export interface ToolProposal {
   consent: ConsentDesign;
   /** Things the human should know before approving. */
   warnings: string[];
+  /**
+   * Reasons this proposal must not be approved as it stands.
+   *
+   * Distinct from `warnings`, which inform. A blocker means the tool cannot do what its
+   * name says, so shipping it would put a lie in front of an agent. The review UI
+   * refuses to approve while any of these stand.
+   */
+  blockers: string[];
   source: AnalyzedForm;
 }

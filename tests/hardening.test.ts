@@ -132,3 +132,76 @@ describe("degenerate forms", () => {
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 });
+
+describe("what real pages turned up", () => {
+  // Everything below was found by running live markup from Hacker News, gov.uk,
+  // Wikipedia, httpbin, MDN, and w3.org through the generator cold.
+
+  it("refuses to make a tool out of a sign-in form", () => {
+    // Hacker News' login page. The password is correctly refused, and what came out was
+    // a tool called `login` taking a username and nothing else: it cannot sign anyone
+    // in, and its description says it can.
+    const [generated] = generate(
+      '<form action="login"><input type="text" name="acct"><input type="password" name="pw">' +
+        '<input type="submit" value="login"></form>',
+    );
+
+    expect(generated.proposal.blockers).toHaveLength(1);
+    expect(generated.proposal.blockers[0]).toContain("sign-in form");
+    expect(generated.proposal.blockers[0]).toContain("unable to");
+  });
+
+  it("refuses a form whose file input it cannot fill", () => {
+    const [generated] = generate(
+      '<form id="up" method="post"><input name="title"><input type="file" name="doc" required>' +
+        "<button type=\"submit\">Upload</button></form>",
+    );
+
+    expect(generated.proposal.blockers.join(" ")).toContain("file input");
+    expect(generated.proposal.blockers.join(" ")).toContain("always submit it empty");
+  });
+
+  it("leaves an ordinary form unblocked", () => {
+    const [generated] = generate(
+      '<form id="ok" method="post"><input name="email" required><button type="submit">Sign up</button></form>',
+    );
+
+    expect(generated.proposal.blockers).toEqual([]);
+  });
+
+  it("does not repeat a blocker as a mild warning as well", () => {
+    const [generated] = generate(
+      '<form id="l" method="post"><input name="u"><input type="password" name="p"></form>',
+    );
+
+    expect(generated.proposal.warnings.join(" ")).not.toContain("Password fields");
+  });
+
+  it("keeps a form that lives inside a dialog", () => {
+    // Modal sign-in, search, and booking forms are everywhere. <dialog> was being
+    // dropped with its contents, which took the form with it and reported no forms at
+    // all. It cannot run anything: the top layer needs showModal(), and script is
+    // already gone by this point.
+    const { html } = sanitizeHtml(
+      '<dialog open><form id="booking" method="post"><input name="who"></form></dialog>',
+    );
+
+    expect(html).toContain('id="booking"');
+    expect(html).toContain('name="who"');
+    expect(generate(html)).toHaveLength(1);
+  });
+
+  it("keeps a form inside a details disclosure too", () => {
+    const { html } = sanitizeHtml(
+      '<details open><summary>Advanced</summary><form id="adv" method="get"><input name="q"></form></details>',
+    );
+
+    expect(generate(html)).toHaveLength(1);
+  });
+
+  it("still drops a template, whose contents are inert", () => {
+    // A form in a template is not on the page, so a tool could not act on it.
+    const { html } = sanitizeHtml('<template><form id="never"><input name="a"></form></template>');
+    expect(html).not.toContain("never");
+  });
+});

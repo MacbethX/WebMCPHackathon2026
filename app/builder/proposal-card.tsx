@@ -54,6 +54,8 @@ export function ProposalCard({
   const { proposal, declarative, imperative, violations } = generated;
   const emission = proposal.route === "declarative" ? declarative : imperative;
 
+  const blocked = proposal.blockers.length > 0;
+
   const overBudget =
     proposal.name.length > BUDGETS.toolName ||
     proposal.description.length > BUDGETS.toolDescription ||
@@ -132,6 +134,14 @@ export function ProposalCard({
         )}
       </div>
 
+      {blocked ? (
+        <ul className={styles.blockers}>
+          {proposal.blockers.map((blocker) => (
+            <li key={blocker}>{blocker}</li>
+          ))}
+        </ul>
+      ) : null}
+
       {proposal.warnings.length > 0 ? (
         <ul className={styles.warnings}>
           {proposal.warnings.map((warning) => (
@@ -209,10 +219,11 @@ export function ProposalCard({
           <button
             className={styles.approve}
             type="button"
-            disabled={overBudget || violations.length > 0}
+            disabled={blocked || overBudget || violations.length > 0}
             onClick={onApprove}
+            title={blocked ? "This form should not become a tool. See the reason above." : undefined}
           >
-            Approve and register
+            {blocked ? "Cannot be approved" : "Approve and register"}
           </button>
         )}
       </div>

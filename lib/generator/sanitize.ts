@@ -20,6 +20,10 @@ const ALLOWED_ELEMENTS = new Set([
   "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
   "strong", "em", "b", "i", "u", "s", "small", "sub", "sup", "code", "pre", "kbd",
   "blockquote", "hr", "br", "figure", "figcaption", "abbr", "time", "mark", "picture",
+  // A <dialog> is an ordinary container. Sign-in, search, and booking forms live inside
+  // one all over the web, and dropping it took the form with it. It cannot run anything:
+  // the top layer needs showModal(), and script is stripped before this ever renders.
+  "dialog", "details", "summary",
   "img", "a",
 ]);
 
@@ -32,7 +36,7 @@ const ALLOWED_ELEMENTS = new Set([
 const DROP_WITH_CONTENTS = new Set([
   "script", "style", "iframe", "object", "embed", "base", "link", "meta",
   "noscript", "template", "svg", "math", "canvas", "audio", "video", "source", "track",
-  "frame", "frameset", "applet", "portal", "dialog",
+  "frame", "frameset", "applet", "portal",
 ]);
 
 /** Attributes kept on any element. */
@@ -68,6 +72,8 @@ const ELEMENT_ATTRIBUTES: Record<string, Set<string>> = {
   col: new Set(["span"]),
   colgroup: new Set(["span"]),
   time: new Set(["datetime"]),
+  dialog: new Set(["open"]),
+  details: new Set(["open"]),
   progress: new Set(["value", "max"]),
   meter: new Set(["value", "min", "max", "low", "high", "optimum"]),
 };

@@ -171,8 +171,9 @@ export function bundleFiles({ tools, generatedAt }: BundleInput): ZipEntry[] {
         : (tool.imperative?.code ?? "");
 
     // A tool that emitted nothing is skipped rather than shipped empty: a zero-byte
-    // module in a bundle reads as a bug in the site, not as a refusal here.
-    if (content.trim().length === 0) continue;
+    // module in a bundle reads as a bug in the site, not as a refusal here. A blocked
+    // one is skipped too, in case it reached here by a path the UI does not guard.
+    if (content.trim().length === 0 || tool.proposal.blockers.length > 0) continue;
 
     entries.push({ path: `tools/${fileNameFor(tool)}`, content });
   }

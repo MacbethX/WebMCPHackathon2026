@@ -163,10 +163,43 @@ function routeFor(form: AnalyzedForm, readOnly: boolean): RouteReason[] {
   return reasons;
 }
 
+/**
+ * Reasons the tool would be incoherent, not merely imperfect.
+ *
+ * Found by running Hacker News' login page through the builder. The password field is
+ * refused, correctly, and what came out the other side was a tool called `login` that
+ * takes a username and nothing else: it cannot log anyone in, and it says it can. An
+ * agent reading that description will try, fail, and have no idea why.
+ *
+ * A form with a password field is an authentication form. The right output for one is
+ * not a weaker tool, it is no tool.
+ */
+function blockersFor(form: AnalyzedForm): string[] {
+  const blockers: string[] = [];
+
+  const password = form.skipped.find((skip) => skip.type === "password");
+  if (password) {
+    blockers.push(
+      "This is a sign-in form. The password field is never exposed to an agent, so any tool made from this form would claim to sign in while being unable to. Leave authentication to the person.",
+    );
+  }
+
+  const requiredFile = form.skipped.find((skip) => skip.type === "file");
+  if (requiredFile) {
+    blockers.push(
+      `"${requiredFile.name}" is a file input, which cannot be filled from a schema. A tool made from this form would always submit it empty.`,
+    );
+  }
+
+  return blockers;
+}
+
 function warningsFor(form: AnalyzedForm, params: ProposedParam[]): string[] {
-  const warnings = form.skipped.map(
-    (skip) => `Left out "${skip.name}" (${skip.type}). ${skip.reason}`,
-  );
+  const warnings = form.skipped
+    // Password and file exclusions are raised as blockers instead, with the consequence
+    // spelled out. Repeating them here as mild warnings would bury the point.
+    .filter((skip) => skip.type !== "password" && skip.type !== "file")
+    .map((skip) => `Left out "${skip.name}" (${skip.type}). ${skip.reason}`);
 
   if (params.length === 0) {
     warnings.push("This form has no fillable controls, so the tool would take no arguments.");
@@ -212,6 +245,7 @@ export function proposeForForm(form: AnalyzedForm): ToolProposal {
     // emitters keep the cautious default until then.
     consent: designConsent({ mutating: !readOnly }),
     warnings: warningsFor(form, params),
+    blockers: blockersFor(form),
     source: form,
   };
 }
