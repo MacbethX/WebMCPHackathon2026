@@ -84,12 +84,13 @@ npm install
 npm run dev
 ```
 
-The builder works with no API key: paste, propose, edit, approve, register, export. A key turns on the in-page agent and the wording helper. Put it in `.env.local`:
+The builder works with no API key: paste, propose, edit, approve, register, export. A key turns on the in-page agent and the wording helper. Bring your own from [console.anthropic.com](https://console.anthropic.com/settings/keys) and put it in `.env.local`:
 
 ```
-MODEL_PROVIDER=anthropic
 ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+Anthropic only, and there is no provider switch. A key scoped to a workspace is the simplest thing to use; an identity-linked one also needs `ANTHROPIC_WORKSPACE_ID`, and the error message says so if you hit it.
 
 `npm test` runs the suite. Two of them shell out on purpose: one compiles every emitted module with the real TypeScript compiler, and one hands the export bundle to the real `unzip`. Generated code that doesn't compile, and a hand-rolled zip that only its own reader accepts, are both things no amount of string assertions would catch.
 

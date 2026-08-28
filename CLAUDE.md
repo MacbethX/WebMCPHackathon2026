@@ -47,7 +47,7 @@ Next.js App Router + TypeScript, single Vercel deployment.
 
 In-page agent: discovers tools via `document.modelContext.getTools()` and invokes via `executeTool()` (spec-native author-provided agent; this surface is a differentiator, use it, do not shortcut by calling tool functions directly).
 
-Model provider: thin adapter in `/api/agent`. Default Anthropic Messages API (Claude, structured JSON via prompt) since Andrew builds with Claude Code and holds a key; OpenAI Responses API (GPT-5.6, structured outputs) as the alternate. One env var switches: `MODEL_PROVIDER=anthropic|openai`, plus `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`. Never expose keys client-side.
+Model: Anthropic Messages API only, in `/api/agent`, structured JSON via `output_config.format`. Bring an `ANTHROPIC_API_KEY`; there is no provider switch. An OpenAI alternate was written and never executed, and was removed once the competition ended: code that claims to work and has never run is worse than code that is absent. Never expose keys client-side. Everything on the site works without a key except the in-page agent and the wording helper, and the UI says which.
 
 ## Quality bar
 
@@ -67,7 +67,7 @@ M6 Stretch: signed tool manifest + verification badge.
 ## Commands and environment
 
 - `npm run dev` / `npm run build` / `npm run lint` / `npm test` (set these up in M1 and keep them green).
-- Env (Vercel + `.env.local`, never committed): `MODEL_PROVIDER`, `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`.
+- Env (Vercel + `.env.local`, never committed): `ANTHROPIC_API_KEY`, optionally `ANTHROPIC_WORKSPACE_ID` (identity-linked keys only) and `TOOLSMITH_SIGNING_KEY` (manifest signing).
 - Deploy: push to main deploys prod via Vercel Git integration (set up in M1). Verify headers on every first deploy of a config change.
 
 ## Writing style for docs and README in this repo

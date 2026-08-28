@@ -36,7 +36,6 @@ import type { ToolProposal } from "@/lib/generator/proposal";
 import styles from "./builder.module.css";
 
 interface ModelStatus {
-  provider: string;
   model: string;
   configured: boolean;
 }
@@ -281,7 +280,7 @@ export default function Builder() {
             </p>
             <p className={model?.configured ? styles.badge : styles.badgeOff}>
               {model?.configured
-                ? `model: ${model.provider} ${model.model}`
+                ? `model: ${model.model}`
                 : "no model key: the agent and the wording helper are off"}
             </p>
             <a className={styles.badgeOff} href="/sandbox">

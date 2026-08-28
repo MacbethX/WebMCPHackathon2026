@@ -93,7 +93,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | Path | Purpose |
 |---|---|
 | `lib/agent/contract.ts` | The wire format between page and proxy. The model decides; it never acts. |
-| `lib/agent/provider.ts` | The model adapter. Anthropic is the exercised path; the OpenAI branch is written to spec and unverified. |
+| `lib/agent/anthropic.ts` | The model call. Anthropic only, key server-side, upstream errors logged and never returned. |
 
 ## `tests/`
 

@@ -19,7 +19,7 @@ import {
   RefineRequestSchema,
   RefineResponseSchema,
 } from "@/lib/agent/contract";
-import { ProviderError, complete, readProviderConfig } from "@/lib/agent/provider";
+import { ModelError, complete, readModelConfig } from "@/lib/agent/anthropic";
 import type { ActRequest, AgentError, RefineRequest } from "@/lib/agent/contract";
 
 export const runtime = "nodejs";
@@ -72,12 +72,7 @@ async function refine(request: RefineRequest) {
     request.context ? `\nText from the page, for vocabulary:\n${request.context}` : "",
   ].join("\n");
 
-  return complete({
-    system: REFINE_SYSTEM,
-    user,
-    schema: RefineResponseSchema,
-    schemaName: "refined_tool_description",
-  });
+  return complete({ system: REFINE_SYSTEM, user, schema: RefineResponseSchema });
 }
 
 async function act(request: ActRequest) {
@@ -97,12 +92,7 @@ async function act(request: ActRequest) {
     tools || "(the page offers no tools)",
   ].join("\n");
 
-  return complete({
-    system: ACT_SYSTEM,
-    user,
-    schema: ActResponseSchema,
-    schemaName: "tool_choice",
-  });
+  return complete({ system: ACT_SYSTEM, user, schema: ActResponseSchema });
 }
 
 export async function POST(httpRequest: Request) {
@@ -126,7 +116,7 @@ export async function POST(httpRequest: Request) {
 
     return NextResponse.json({ ok: true, data });
   } catch (cause) {
-    if (cause instanceof ProviderError) {
+    if (cause instanceof ModelError) {
       // A missing key is the operator's problem, not a server fault, and it is the one
       // case where the person on the page can be told exactly what to do about it.
       return bad(cause.message, cause.configuration ? 503 : 502, cause.configuration);
@@ -137,10 +127,6 @@ export async function POST(httpRequest: Request) {
 
 /** Whether the proxy is usable, so the UI can say so before anyone tries. */
 export async function GET() {
-  const config = readProviderConfig();
-  return NextResponse.json({
-    provider: config.provider,
-    model: config.model,
-    configured: config.apiKey !== null,
-  });
+  const config = readModelConfig();
+  return NextResponse.json({ model: config.model, configured: config.apiKey !== null });
 }
