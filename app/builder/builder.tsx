@@ -16,6 +16,7 @@
  * the agent sees what the browser sees.
  */
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { buildBundle, bundleFileName } from "@/lib/generator/bundle";
 import { checkInput, generate, regenerate } from "@/lib/generator/generate";
@@ -29,7 +30,7 @@ import { useRegisteredTools } from "@/lib/webmcp/use-registered-tools";
 import { withTrust } from "@/lib/webmcp/trust";
 import { AgentPanel } from "./agent-panel";
 import { ProposalCard } from "./proposal-card";
-import { SAMPLE_HTML } from "./sample";
+import { EXAMPLES } from "./examples";
 import type { GeneratedTool } from "@/lib/generator/generate";
 import type { RefineResponse, AgentResult } from "@/lib/agent/contract";
 import type { ToolProposal } from "@/lib/generator/proposal";
@@ -283,9 +284,9 @@ export default function Builder() {
                 ? `model: ${model.model}`
                 : "no model key: the agent and the wording helper are off"}
             </p>
-            <a className={styles.badgeOff} href="/sandbox">
+            <Link className={styles.badgeOff} href="/sandbox">
               sandbox shop
-            </a>
+            </Link>
           </div>
         </header>
 
@@ -303,13 +304,24 @@ export default function Builder() {
                 <button className={styles.primary} type="button" onClick={propose}>
                   Propose tools
                 </button>
-                <button
-                  className={styles.secondary}
-                  type="button"
-                  onClick={() => setPasted(SAMPLE_HTML)}
-                >
-                  Use the sample form
-                </button>
+              </div>
+
+              <div className={styles.examples}>
+                <p className={styles.label}>Or try one of these</p>
+                {EXAMPLES.map((example) => (
+                  <button
+                    className={styles.example}
+                    key={example.id}
+                    type="button"
+                    onClick={() => {
+                      setPasted(example.html);
+                      setNotice(null);
+                    }}
+                  >
+                    <span className={styles.exampleLabel}>{example.label}</span>
+                    <span className={styles.exampleWhy}>{example.demonstrates}</span>
+                  </button>
+                ))}
               </div>
               {notice ? <p className={styles.note}>{notice}</p> : null}
               {sanitized && sanitized.removed.length > 0 ? (

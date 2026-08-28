@@ -78,6 +78,26 @@
 .small { padding: 0.2rem 0.6rem; font-size: 0.78rem; background: #fffdf7; }
 .primary:disabled, .secondary:disabled, .approve:disabled { opacity: 0.45; cursor: default; }
 
+/*
+  The examples. Each says what it demonstrates, because a row of unlabelled buttons
+  teaches nothing and these exist to show what the generator reasons about.
+*/
+.examples { margin-top: 0.9rem; display: grid; gap: 0.4rem; }
+
+.example {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid #c9b894;
+  background: #fffdf7;
+  padding: 0.45rem 0.6rem;
+  color: inherit;
+}
+.example:hover { border-color: #241c14; background: #f6efe2; }
+
+.exampleLabel { display: block; font-weight: 700; font-size: 0.86rem; }
+.exampleWhy { display: block; font-size: 0.78rem; color: #6b5b45; margin-top: 0.1rem; }
+
 .note { margin: 0.6rem 0 0; font-size: 0.82rem; color: #4c4034; }
 .error { margin: 0.6rem 0 0; font-size: 0.82rem; color: #9c3b1b; }
 .mono { font-family: "Courier New", monospace; font-size: 0.75rem; }

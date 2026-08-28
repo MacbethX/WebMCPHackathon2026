@@ -25,6 +25,16 @@ And one idea I couldn't shake: if an agent can call tools, it should be able to 
 
 ![The builder: pasted markup on the right, the proposed tool on the left, every field editable](docs/images/02-proposals.jpg)
 
+If you land here without any HTML to hand, there are four examples in the paste panel, each chosen because it makes the generator do something rather than just describe it: a booking form that routes imperative and says why, a search form that is detected read-only, a sign-in form it refuses to build at all, and two forms whose submit buttons both say "Sign up".
+
+![A sign-in form, refused: any tool from it would claim to sign in and be unable to](docs/images/05-blocked-signin.jpg)
+
+## What it refuses to build
+
+Not every form should become a tool. A sign-in form is the clearest case: the password is never exposed to an agent, so a tool made from what is left would claim to sign in and be unable to, and an agent calling it would have no way to know why. Refusing the field was right; making a weaker tool from the remainder was not. That one came out of running Hacker News' login page through the builder cold ([spike 7](research/raw/spike-7-wild-markup.md)).
+
+Proposals carry `blockers` separately from `warnings`. A warning informs; a blocker means approval is refused and the export skips the tool. A file input blocks too, since it can never be filled from a schema.
+
 ## The one question it won't answer for you
 
 `toolautosubmit` is not a convenience attribute. Without it the browser fills a form and waits for a person; with it, nobody is standing there. It is the consent decision for a declarative tool, and it is the only setting whose wrong value cannot be caught in code review, because the harm happens the first time an agent runs.

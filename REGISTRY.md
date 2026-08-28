@@ -41,7 +41,7 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `app/builder/builder.tsx` | The loop: paste, sanitize, propose, review, approve, register live. |
 | `app/builder/proposal-card.tsx` | One proposal to read, edit, and approve. Renders the consent question from data, never as a checkbox. |
 | `app/builder/agent-panel.tsx` | The in-page agent. Discovers via `getTools`, invokes via `executeTool`, never calls a tool function directly. |
-| `app/builder/sample.ts` | A plain unannotated form to try the builder on. |
+| `app/builder/examples.ts` | Four forms to try the builder on, each chosen to make it do something rather than describe it. |
 | `app/builder/builder.module.css` | Builder styling, including the pseudo-classes applied to pasted forms. |
 | `app/api/validate/route.ts` | Server-side revalidation for sandbox mutations. The trust boundary. |
 | `app/api/agent/route.ts` | The model proxy. Refines prose, or picks a tool. Never runs one. Key stays server-side. |
@@ -118,3 +118,4 @@ commit that adds or moves anything (CLAUDE.md, "File registry").
 | `tests/bundle.test.ts` | The archive, checked by the real `unzip` rather than by its own reader. |
 | `tests/live-tool.test.ts` | A value the control refuses is reported as refused, not as filled. |
 | `tests/manifest.test.ts` | Tampering, forged keys, wrong origin, and injected tools. The badge has to refuse. |
+| `tests/examples.test.ts` | Holds each example's label to its word, so a stale label cannot mislead. |

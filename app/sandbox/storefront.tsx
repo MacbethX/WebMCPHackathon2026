@@ -23,6 +23,7 @@
  * Without WebMCP none of this is reachable and the shop behaves like an ordinary page.
  */
 
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { PRODUCTS } from "./catalog";
 import { submitGuestbookEntry } from "./guestbook";
@@ -203,7 +204,10 @@ export default function Storefront() {
             {supported
               ? "WebMCP detected: this page offers tools to agents"
               : "No WebMCP here: ordinary shop, everything works"}
-          </p>
+          </p>{" "}
+          <Link className={styles.badgeOff} href="/">
+            back to the builder
+          </Link>
         </header>
 
         <section aria-labelledby="stock">

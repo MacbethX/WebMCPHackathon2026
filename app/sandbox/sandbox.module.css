@@ -27,7 +27,7 @@
   border: 2px solid;
 }
 .badgeOn { border-color: #2f6b3a; color: #2f6b3a; background: #e4f0e2; }
-.badgeOff { border-color: #8a8175; color: #6b5b45; background: #ece5d8; }
+.badgeOff { border-color: #8a8175; color: #6b5b45; background: #ece5d8; text-decoration: none; }
 
 .heading {
   font-size: 1.1rem;
